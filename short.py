@@ -27,11 +27,11 @@ except:
 chrome_options = webdriver.ChromeOptions()
 chrome_options.headless=True
 
-for url in url_list:
+browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+wait = WebDriverWait(browser, 20)
+print("New Browser Opened")
 
-    browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-    wait = WebDriverWait(browser, 20)
-    print("New Browser Opened")
+for url in url_list:
 
     browser.get(url)
     time.sleep(1)
