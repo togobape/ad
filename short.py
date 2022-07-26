@@ -1,39 +1,43 @@
-import time
+import time, sys
 from colorama import Fore, Style
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
-
+# For Webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 # url = "https://ouo.io/idvRmi"
-url = "http://theinfogiver.elementfx.com/tutorial/news-1.html"
+# url = "http://theinfogiver.elementfx.com/tutorial/news-1.html"
+
+url_list_file = sys.argv[1]
+url_list = []
+try:
+    with open(url_list_file, 'r') as lf:
+        url_list_n = lf.readlines()
+        for n in url_list_n:
+            url_list.append(n.strip())
+except:
+    print("Choose a correct URL list..!!")
+    sys.exit(0)
 
 
 chrome_options = webdriver.ChromeOptions()
-# chrome_options.add_argument('--proxy-server=%s' % proxy)
-# chrome_options.headless=True
+chrome_options.headless=True
 
-browser = webdriver.Chrome(options=chrome_options)
-wait = WebDriverWait(browser, 20)
+for url in url_list:
 
-browser.get(url)
-time.sleep(1)
-parentGUID = browser.current_window_handle
+    browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    wait = WebDriverWait(browser, 20)
+    print("New Browser Opened")
 
-
-while True:
-
-    ad_button = browser.find_element_by_name("first_button")
-    ad_button.click()
-    print("Ad Button Clicked")
-
-    browser.switch_to.window(browser.window_handles[1])
-    print("Switched to AD Window.!")
+    browser.get(url)
+    time.sleep(1)
+    parentGUID = browser.current_window_handle
 
     try:
-
         # First One
         # time.sleep(10)
         # wait.until(EC.element_to_be_clickable((By.ID, "btn-main")))
@@ -59,14 +63,14 @@ while True:
         time.sleep(3)
         if (len(browser.window_handles) > 1):
             try:
-                browser.switch_to.window(browser.window_handles[2])
+                browser.switch_to.window(browser.window_handles[1])
                 print("Tab switched")
                 browser.close()
                 print("Tab Closed")
             except Exception as err2:
                 print(f"[+] ERROR2: {err2}")
 
-        browser.switch_to.window(browser.window_handles[1])
+        browser.switch_to.window(parentGUID)
 
         print(Fore.GREEN+Style.BRIGHT+" >> Success"+Style.RESET_ALL)
     except Exception as err:
@@ -74,7 +78,7 @@ while True:
         print(f"[+] ERROR1: {err}")
         pass
 
-    time.sleep(5)
+    time.sleep(3)
 
     while (len(browser.window_handles) > 1):
         try:
@@ -85,15 +89,12 @@ while True:
         except:
             pass
 
-    browser.switch_to.window(parentGUID)
-
-    next_button = browser.find_element_by_name("second_button")
-    next_button.click()
-    print("Next Button Clicked")
-    time.sleep(2)
+        browser.switch_to.window(parentGUID)
 
     browser.delete_all_cookies()
     print("All Cookie Deleted")
 
+    time.sleep(2)
+    
 browser.quit()
-
+print("Browser Closed")
