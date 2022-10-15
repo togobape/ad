@@ -9,6 +9,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from urllib.parse import urlparse
 # For Webdriver
 # from selenium.webdriver.chrome.service import Service
 # from webdriver_manager.chrome import ChromeDriverManager
@@ -38,8 +41,12 @@ os.system("chmod +x bin/geckodriver")
 print("CHMOD of gecko changed")
 
 # Browser Loading Section
+# For Firefox scrolling bug fix
+caps = DesiredCapabilities().FIREFOX
+caps["marionette"] = True
+
 options = Options()
-options.headless = True
+# options.headless = True
 browser = webdriver.Firefox(options=options, executable_path=r'bin/geckodriver')
 browser.install_addon(f'{current_dir}/bin/tampermonkey-4.17.6161.xpi', temporary=True)
 wait = WebDriverWait(browser, 20)
@@ -113,7 +120,17 @@ time.sleep(5)
 
 print("Captcha Bypassser Installed")
 
-browser.get("http://stackoverflow.com")
+browser.get("https://stackoverflow.com")
+time.sleep(3)
+browser.get("https://google.com")
+time.sleep(3)
+browser.get("https://facebook.com")
+time.sleep(3)
+browser.get("https://twitter.com")
+time.sleep(3)
+browser.get("https://instagram.com")
+time.sleep(3)
+browser.get("https://duckduckgo.com")
 time.sleep(3)
 parentGUID = browser.current_window_handle
 
@@ -156,8 +173,8 @@ for link in links:
 print("==============================================================================")
 print("=================                   al.ly                    =================")
 print("==============================================================================")
-
-links = [{"short" : "https://dausel.co/0G55Dt", "end_url" : "https://faucetpay.io/?r=4218525"}, {"short" : "https://dausel.co/9WCUnt", "end_url" : "https://www.freepik.com/collection/freepik-by-felipe-novoa/3513525"}]
+print("******* Problematic Have to check *******")
+links = [{"short" : "https://dausel.co/vtgRLb", "end_url" : "https://faucetpay.io/?r=4218525"}, {"short" : "https://dausel.co/TyryTR", "end_url" : "https://www.freepik.com/collection/freepik-by-felipe-novoa/3513525"}]
 
 for link in links:
     try:
@@ -166,16 +183,19 @@ for link in links:
         time.sleep(15)
         
         wait.until(EC.presence_of_element_located((By.XPATH, "//a[@class='btn skip-btn redirect']//strong[contains(text(), 'Continue')]")))
-        time.sleep(5)
-        skip_button = browser.find_element_by_xpath("//a[@class='btn skip-btn redirect']")
+        time.sleep(10)
+        skip_button = browser.find_element_by_xpath("//a[@class='btn skip-btn redirect']//strong[contains(text(), 'Continue')]")
         
-        while browser.current_url == link["short"] :
+        domain = urlparse(browser.current_url).netloc
+        
+        while domain == "al.ly" :
             ActionChains(browser).move_to_element(skip_button).click().perform()
             print("Button Clicked..!")
             time.sleep(2)
             browser.switch_to.window(parentGUID)
             print(browser.current_url)
             time.sleep(2)
+            domain = urlparse(browser.current_url).netloc
         
         print(browser.current_url)
         print(Fore.GREEN+Style.BRIGHT+" >> Success"+Style.RESET_ALL)
@@ -189,7 +209,7 @@ print("=========================================================================
 print("=================                 shorte.st                  =================")
 print("==============================================================================")
 
-links = [{"short" : "http://destyy.com/edRMKl", "end_url" : "https://www.freepik.com/collection/freepik-by-felipe-novoa/3513525"}, {"short" : "festyy.com/edQHIp", "end_url" : "https://faucetpay.io/?r=4218525"}]
+links = [{"short" : "http://destyy.com/edRMKl", "end_url" : "https://www.freepik.com/collection/freepik-by-felipe-novoa/3513525"}, {"short" : "http://festyy.com/edQHIp", "end_url" : "https://faucetpay.io/?r=4218525"}]
 
 for link in links:
     
@@ -218,7 +238,7 @@ for link in links:
         print(f"[+] ERROR: {err}")
 
     
-'''
+
 # Not working. Site get blocked.
 print("==============================================================================")
 print("=================                    bc.vc                   =================")
@@ -236,7 +256,7 @@ for link in links:
         pass
     
     
-'''
+
 print("==============================================================================")
 print("=================                   za.gl                    =================")
 print("==============================================================================")
@@ -388,11 +408,21 @@ for link in links:
         browser.get(link["short"])
         
         time.sleep(3)
+        # last_height = browser.execute_script("return document.body.scrollHeight")
+        # browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         
-        skip_button = browser.find_element_by_xpath("//button[contains(text(), 'CLICK HERE TO CONTINUE')]")
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
+        dommmn = browser.current_url
+        while browser.current_url == dommmn:
+            skip_button = browser.find_element_by_xpath("//button[contains(text(), 'CLICK HERE TO CONTINUE')]")
+            ActionChains(browser).move_to_element(skip_button).click().perform()
+            time.sleep(5)
+            browser.switch_to.window(parentGUID)
+            time.sleep(2)
+            print(browser.current_url)
+            if browser.current_url != dommmn:
+                break
+            dommmn = browser.current_url
+            # print(dommmn)
         # ActionChains(browser).move_to_element(skip_button).click().perform()
         # time.sleep(2)
         # browser.switch_to.window(parentGUID)
@@ -400,24 +430,52 @@ for link in links:
         print("Waiting for captcha to get verified..")
         time.sleep(17)
         
+        print("Verified")
+        
         wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'CLICK HERE TO CONTINUE')]")))
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         skip_button_c = browser.find_element_by_xpath("//button[contains(text(), 'CLICK HERE TO CONTINUE')]")
-        ActionChains(browser).move_to_element(skip_button_c).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
+        
+        print("Button Found")
+        
+        dommmn = browser.current_url
+        
+        print(dommmn)
+        
+        while browser.current_url == dommmn:
+            ActionChains(browser).move_to_element(skip_button_c).click().perform()
+            time.sleep(2)
+            browser.switch_to.window(parentGUID)
+            time.sleep(2)
+            print(browser.current_url)
+            
+            try:
+                browser.find_element_by_xpath("//span[@class='countdown']//span[@id='timer']")
+                print("Timer Triggered")
+                break
+            except:
+                pass
+            
+            dommmn = browser.current_url
+            
         # ActionChains(browser).move_to_element(skip_button).click().perform()
         # time.sleep(2)
         # browser.switch_to.window(parentGUID)
         
         time.sleep(6)
         wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Get Link')]")))
-        
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         skip_button_2 = browser.find_element_by_xpath("//a[contains(text(), 'Get Link')]")
+        
+        print("SKip Button 2 Found ")
         
         while browser.current_url != link["end_url"] :
             ActionChains(browser).move_to_element(skip_button_2).click().perform()
             time.sleep(2)
             browser.switch_to.window(parentGUID)
+            time.sleep(5)
             
         print(Fore.GREEN+Style.BRIGHT+" >> Success"+Style.RESET_ALL)
         
@@ -438,37 +496,74 @@ for link in links:
         browser.get(link["short"])
         
         time.sleep(3)
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         
-        skip_button = browser.find_element_by_xpath("//button[contains(text(), 'CLICK HERE TO CONTINUE')]")
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
+        dommmn = browser.current_url
+        while browser.current_url == dommmn:
+            skip_button = browser.find_element_by_xpath("//button[contains(text(), 'CLICK HERE TO CONTINUE')]")
+            ActionChains(browser).move_to_element(skip_button).click().perform()
+            time.sleep(5)
+            browser.switch_to.window(parentGUID)
+            time.sleep(2)
+            print(browser.current_url)
+            if browser.current_url != dommmn:
+                break
+            dommmn = browser.current_url
+            # print(dommmn)
         # ActionChains(browser).move_to_element(skip_button).click().perform()
         # time.sleep(2)
         # browser.switch_to.window(parentGUID)
         
         print("Waiting for captcha to get verified..")
-        time.sleep(15)
+        time.sleep(17)
+        
+        print("Verified")
         
         wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'CLICK HERE TO CONTINUE')]")))
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         skip_button_c = browser.find_element_by_xpath("//button[contains(text(), 'CLICK HERE TO CONTINUE')]")
-        ActionChains(browser).move_to_element(skip_button_c).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
+        
+        print("Button Found")
+        
+        dommmn = browser.current_url
+        
+        print(dommmn)
+        
+        while browser.current_url == dommmn:
+            ActionChains(browser).move_to_element(skip_button_c).click().perform()
+            time.sleep(2)
+            browser.switch_to.window(parentGUID)
+            time.sleep(2)
+            print(browser.current_url)
+            
+            try:
+                browser.find_element_by_xpath("//span[@class='countdown']//span[@id='timer']")
+                print("Timer Triggered")
+                break
+            except:
+                pass
+            
+            dommmn = browser.current_url
+            
         # ActionChains(browser).move_to_element(skip_button).click().perform()
         # time.sleep(2)
         # browser.switch_to.window(parentGUID)
         
-        time.sleep(12)
+        time.sleep(13)
         wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Get Link')]")))
-        
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         skip_button_2 = browser.find_element_by_xpath("//a[contains(text(), 'Get Link')]")
+        
+        print("SKip Button 2 Found ")
         
         while browser.current_url != link["end_url"] :
             ActionChains(browser).move_to_element(skip_button_2).click().perform()
             time.sleep(2)
             browser.switch_to.window(parentGUID)
-            time.sleep(3)
+            time.sleep(5)
             
         print(Fore.GREEN+Style.BRIGHT+" >> Success"+Style.RESET_ALL)
         
@@ -478,10 +573,11 @@ for link in links:
         
     
 
+# Problem with height width issue for firefox
 print("==============================================================================")
 print("=================                 adshort.co                 =================")
 print("==============================================================================")
-
+print("******** Problem with height width issue for firefox *********")
 links = [{"short" : "https://adshort.co/dJc89Ixh", "end_url" : "https://faucetpay.io/?r=4218525"}, {"short" : "https://adshort.co/hoz1zQ", "end_url" : "https://www.freepik.com/collection/freepik-by-felipe-novoa/3513525"}]
 
 for link in links:
@@ -489,47 +585,141 @@ for link in links:
         browser.get(link["short"])
         
         time.sleep(3)
+        # last_height = browser.execute_script("return document.body.scrollHeight")
+        # browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         
-        skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
+        dommmn = browser.current_url
+        while True:
+            skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
+            ActionChains(browser).move_to_element(skip_button).click().perform()
+            time.sleep(5) 
+            browser.switch_to.window(parentGUID)
+            time.sleep(2)
+            print(browser.current_url)
+            # if browser.current_url != dommmn:
+            #     break
+            try:
+                browser.find_element_by_xpath("//iframe[@title='reCAPTCHA']")
+                print("Recaptcha Triggered")
+                break
+            except:
+                pass
+                
+            dommmn = browser.current_url
+            # print(dommmn)
         # ActionChains(browser).move_to_element(skip_button).click().perform()
         # time.sleep(2)
         # browser.switch_to.window(parentGUID)
         
         print("Waiting for captcha to get verified..")
-        time.sleep(15)
+        time.sleep(17)
+        
+        print("Verified")
         
         wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Click here to continue')]")))
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        # body_pg_dn = browser.find_element_by_tag_name("body")
+        # body_pg_dn.send_keys(Keys.PAGE_UP)
+        # body_pg_dn.send_keys(Keys.PAGE_UP)
         skip_button_c = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
-        ActionChains(browser).move_to_element(skip_button_c).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
-        time.sleep(2)
-        ActionChains(browser).move_to_element(skip_button_c).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
+        
+        print("Button Found")
+        
+        dommmn = browser.current_url
+        
+        print(dommmn)
+        
+        while True:
+            ActionChains(browser).move_to_element(skip_button_c).click().perform()
+            time.sleep(2)
+            browser.switch_to.window(parentGUID)
+            time.sleep(2)
+            print(browser.current_url)
+            
+            try:
+                browser.find_element_by_xpath("//span[@class='countdown']//span[@id='timer']")
+                print("Timer Triggered")
+                break
+            except:
+                pass
+            
+            dommmn = browser.current_url
+            
         # ActionChains(browser).move_to_element(skip_button).click().perform()
         # time.sleep(2)
         # browser.switch_to.window(parentGUID)
         
-        time.sleep(17)
+        time.sleep(13)
         wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Obtener vínculo')]")))
-        
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         skip_button_2 = browser.find_element_by_xpath("//a[contains(text(), 'Obtener vínculo')]")
+        
+        print("SKip Button 2 Found ")
         
         while browser.current_url != link["end_url"] :
             ActionChains(browser).move_to_element(skip_button_2).click().perform()
             time.sleep(2)
             browser.switch_to.window(parentGUID)
-            time.sleep(3)
+            time.sleep(5)
             
         print(Fore.GREEN+Style.BRIGHT+" >> Success"+Style.RESET_ALL)
         
     except Exception as err:
         print(Fore.RED+Style.BRIGHT+" >> Failed"+Style.RESET_ALL)
         print(f"[+] ERROR: {err}")
+
+
+
+
+
+# for link in links:
+#     try:
+#         browser.get(link["short"])
+        
+#         time.sleep(3)
+        
+#         skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
+#         ActionChains(browser).move_to_element(skip_button).click().perform()
+#         time.sleep(2)
+#         browser.switch_to.window(parentGUID)
+#         # ActionChains(browser).move_to_element(skip_button).click().perform()
+#         # time.sleep(2)
+#         # browser.switch_to.window(parentGUID)
+        
+#         print("Waiting for captcha to get verified..")
+#         time.sleep(15)
+        
+#         wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Click here to continue')]")))
+#         skip_button_c = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
+#         ActionChains(browser).move_to_element(skip_button_c).click().perform()
+#         time.sleep(2)
+#         browser.switch_to.window(parentGUID)
+#         time.sleep(2)
+#         ActionChains(browser).move_to_element(skip_button_c).click().perform()
+#         time.sleep(2)
+#         browser.switch_to.window(parentGUID)
+#         # ActionChains(browser).move_to_element(skip_button).click().perform()
+#         # time.sleep(2)
+#         # browser.switch_to.window(parentGUID)
+        
+#         time.sleep(17)
+#         wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Obtener vínculo')]")))
+        
+#         skip_button_2 = browser.find_element_by_xpath("//a[contains(text(), 'Obtener vínculo')]")
+        
+#         while browser.current_url != link["end_url"] :
+#             ActionChains(browser).move_to_element(skip_button_2).click().perform()
+#             time.sleep(2)
+#             browser.switch_to.window(parentGUID)
+#             time.sleep(3)
+            
+#         print(Fore.GREEN+Style.BRIGHT+" >> Success"+Style.RESET_ALL)
+        
+#     except Exception as err:
+#         print(Fore.RED+Style.BRIGHT+" >> Failed"+Style.RESET_ALL)
+#         print(f"[+] ERROR: {err}")
     
     
 
@@ -545,26 +735,69 @@ for link in links:
         
         time.sleep(3)
         
-        skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
-        time.sleep(2)
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
+        dommmn = browser.current_url
+        while True:
+            skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
+            ActionChains(browser).move_to_element(skip_button).click().perform()
+            time.sleep(5) 
+            browser.switch_to.window(parentGUID)
+            time.sleep(2)
+            print(browser.current_url)
+            if browser.current_url != dommmn:
+                break
+            # try:
+            #     browser.find_element_by_xpath("//iframe[@title='reCAPTCHA']")
+            #     print("Recaptcha Triggered")
+            #     break
+            # except:
+            #     pass
+                
+            dommmn = browser.current_url
+            # print(dommmn)
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
+        
+        # skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
+        # time.sleep(2)
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
         # ActionChains(browser).move_to_element(skip_button).click().perform()
         # time.sleep(2)
         # browser.switch_to.window(parentGUID)
         
         print("Waiting for captcha to get verified..")
+        time.sleep(20)
+        
+        not_robot_button = browser.find_element_by_xpath("//a[@id='wpsafelinkhuman']")
+        not_robot_button.click()
+        
+        print("Waiting for timer 1 to over")
+        time.sleep(18)
+        
+        generate_link_button = browser.find_element_by_xpath("//a[@href='#wpsafegenerate']")
+        generate_link_button.click()
+        
+        time.sleep(5)
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        
+        generate_link_button_2 = browser.find_element_by_xpath("//img[@alt='image3']")
+        generate_link_button_2.click()
+        
+        print("Waiting for captcha to get verified..")
         time.sleep(17)
         
-        print("Waiting for time to over")
-        time.sleep(12)
+        print("Waiting for timer 2 to over")
+        time.sleep(5)
         wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'Get Link ')]")))
         
         time.sleep(2)
+        
         skip_button_2 = browser.find_element_by_xpath("//a[contains(text(), 'Get Link ')]")
         
         while browser.current_url != link["end_url"] :
@@ -580,7 +813,7 @@ for link in links:
         print(f"[+] ERROR: {err}")
     
     
-'''
+
 # Site cannot be reached
 print("==============================================================================")
 print("=================                   cuty.io                  =================")
@@ -589,19 +822,56 @@ print("=========================================================================
 links = [{"short" : "https://cuty.io/AEfp4CgjO", "end_url" : "https://www.freepik.com/collection/freepik-by-felipe-novoa/3513525"}, {"short" : "https://cuty.io/7CYnaLHhie7k", "end_url" : "https://faucetpay.io/?r=4218525"}]
 
 for link in links:
-    browser.get(link["short"])
     
-    if browser.current_url == link["end_url"] :
-        pass
+    try:
+        browser.get(link["short"])
+        
+        time.sleep(2)
+        
+        while True:
+            continue_button = browser.find_element_by_xpath("//button[contains(text(), 'Continue')]")
+            ActionChains(browser).move_to_element(continue_button).click().perform()
+            time.sleep(5) 
+            browser.switch_to.window(parentGUID)
+            time.sleep(3)
+            print(browser.current_url)
+            try:
+                browser.find_element_by_xpath("//iframe[@title='reCAPTCHA']")
+                print("Recaptcha Triggered")
+                break
+            except:
+                pass
+        
+        print("Waiting for Captcha Verify")
+        time.sleep(20)
+        
+        print("Waiting for time to over")
+        time.sleep(7)
+        
+        wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Go ->')]")))
+        go_button = browser.find_element_by_xpath("//button[contains(text(), 'Go ->')]")
+        go_button.click()
+        
+        # continue_button = browser.find_element_by_xpath("//button[contains(text(), 'Continue')]")
+        # ActionChains(browser).move_to_element(continue_button).click().perform()
+        
+        time.sleep(3)
+        
+        if browser.current_url == link["end_url"] :
+            print(Fore.GREEN+Style.BRIGHT+" >> Success"+Style.RESET_ALL)
+        
+    except Exception as err:
+        print(Fore.RED+Style.BRIGHT+" >> Failed"+Style.RESET_ALL)
+        print(f"[+] ERROR: {err}")
     
     
 
-'''
+
 # Problem with IP request.
 print("==============================================================================")
 print("=================                urlshortx.com               =================")
 print("==============================================================================")
-
+print("******* Problem with IP request *********")
 links = [{"short" : "https://xpshort.com/FTGzmnkn", "end_url" : "https://www.freepik.com/collection/freepik-by-felipe-novoa/3513525"}, {"short" : "https://xpshort.com/9mObdTa", "end_url" : "https://faucetpay.io/?r=4218525"}]
 
 for link in links:
@@ -610,7 +880,10 @@ for link in links:
         time.sleep(3)
         
         print("Waiting for Captcha to get Verified")
-        time.sleep(15)
+        time.sleep(17)
+        
+        # last_height = browser.execute_script("return document.body.scrollHeight")
+        # browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         
         wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Continue')]")))
         continue_button = browser.find_element_by_xpath("//a[contains(text(), 'Continue')]")
@@ -620,6 +893,9 @@ for link in links:
         
         print("Waiting for time to Over")
         time.sleep(15)
+        
+        # last_height = browser.execute_script("return document.body.scrollHeight")
+        # browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         
         wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Continue')]")))
         continue_button_2 = browser.find_element_by_xpath("//button[contains(text(), 'Continue')]")
@@ -650,10 +926,11 @@ for link in links:
     
 
 
+# Firefox Scrolling Issue
 print("==============================================================================")
 print("=================                shrinkme.io                 =================")
 print("==============================================================================")
-
+print("************ Firefox Scrolling Issue **********")
 links = [{"short" : "https://shrinke.me/GUVuE8", "end_url" : "https://www.freepik.com/collection/freepik-by-felipe-novoa/3513525"}, {"short" : "https://shrinke.me/SsEVtW", "end_url" : "https://faucetpay.io/?r=4218525"}]
 
 for link in links:
@@ -665,31 +942,48 @@ for link in links:
         print("Waiting for captcha to get verified..")
         time.sleep(17)
         
-        skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
-        time.sleep(2)
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
-        time.sleep(2)
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
-        time.sleep(2)
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
-        time.sleep(2)
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
-        time.sleep(2)
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         
+        while True:
+            skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
+            ActionChains(browser).move_to_element(skip_button).click().perform()
+            time.sleep(2)
+            browser.switch_to.window(parentGUID)
+            time.sleep(3)
+            print(browser.current_url)
+        # skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
+        # time.sleep(2)
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
+        # time.sleep(2)
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
+        # time.sleep(2)
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
+        # time.sleep(2)
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
+        # time.sleep(2)
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
+        
+            try:
+                browser.find_element_by_xpath("//span[@class='countdown']//span[@id='timer']")
+                print("Timer Triggered")
+                break
+            except:
+                pass
+            
         # ActionChains(browser).move_to_element(skip_button).click().perform()
         # time.sleep(2)
         # browser.switch_to.window(parentGUID)
@@ -702,6 +996,8 @@ for link in links:
         wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'Get Link')]")))
         
         time.sleep(2)
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         skip_button_2 = browser.find_element_by_xpath("//a[contains(text(), 'Get Link')]")
         
         while browser.current_url != link["end_url"] :
@@ -744,9 +1040,23 @@ for link in links:
         time.sleep(2)
         
         skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
-        ActionChains(browser).move_to_element(skip_button).click().perform()
-        time.sleep(2)
-        browser.switch_to.window(parentGUID)
+        while True:
+            ActionChains(browser).move_to_element(skip_button).click().perform()
+            time.sleep(2)
+            browser.switch_to.window(parentGUID)
+            time.sleep(2)
+            print(browser.current_url)
+            
+            try:
+                browser.find_element_by_xpath("//span[@class='countdown']//span[@id='timer']")
+                print("Timer Triggered")
+                break
+            except:
+                pass
+        # skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
+        # ActionChains(browser).move_to_element(skip_button).click().perform()
+        # time.sleep(2)
+        # browser.switch_to.window(parentGUID)
         
         print("Waiting for time to over")
         time.sleep(10)
@@ -781,18 +1091,39 @@ for link in links:
         
         time.sleep(5)
         
-        print("Waiting for captcha to get verified..")
-        time.sleep(17)
+        print("Waiting for captcha one to get verified..")
+        time.sleep(15)
         
-        ad_frame = browser.find_elements_by_tag_name("iframe")[-1]
-        browser.switch_to.frame(ad_frame)
+        print("Waiting for captcha two to get verified..")
+        time.sleep(15)
         
-        close_button = browser.find_element_by_xpath("//span[contains(text(), 'Close')]")
-        ActionChains(browser).move_to_element(close_button).click().perform()
+        try:
+            ad_frame_test = browser.find_elements_by_tag_name("iframe")
+            print(ad_frame_test)
+            
+            ad_frame = browser.find_elements_by_tag_name("iframe")[-1]
+            browser.switch_to.frame(ad_frame)
+            
+            close_button = browser.find_element_by_xpath("//span[contains(text(), 'Close')]")
+            ActionChains(browser).move_to_element(close_button).click().perform()
         
-        browser.switch_to.window(parentGUID)
+            browser.switch_to.window(parentGUID)
+        except:
+            print("No frame ad found")
         
         time.sleep(2)
+        
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        
+        print("Looking for button")
+        #<button class="btn btn-outline-primary btn-captcha m-2" id="invisibleCaptchaShortlink" onclick="window.open('https://webhostingpost.com/go.html')" type="submit">Click here to continue</button>
+        wait.until(EC.presence_of_element_located((By.XPATH, "//form[@method='POST')]//button[@id='invisibleCaptchaShortlink')]"))) #method="POST"
+        
+        print("button located")
+        
+        # last_height = browser.execute_script("return document.body.scrollHeight")
+        # browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         
         skip_button = browser.find_element_by_xpath("//button[contains(text(), 'Click here to continue')]")
         ActionChains(browser).move_to_element(skip_button).click().perform()
@@ -825,6 +1156,4 @@ print("============ All Link Visit Finished ==============")
 print("===================================================")
 
 
-
 browser.quit()
-
