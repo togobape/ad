@@ -44,10 +44,12 @@ print("CHMOD of gecko changed")
 # For Firefox scrolling bug fix
 caps = DesiredCapabilities().FIREFOX
 caps["marionette"] = True
-
+print("Scrolling fix set")
 options = Options()
+print("Option loaded 
 options.headless = True
 browser = webdriver.Firefox(options=options, executable_path=r'bin/geckodriver')
+print("Browser Loaded")
 browser.install_addon(f'{current_dir}/bin/tampermonkey-4.17.6161.xpi', temporary=True)
 wait = WebDriverWait(browser, 20)
 time.sleep(15)
