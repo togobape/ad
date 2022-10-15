@@ -46,7 +46,7 @@ caps = DesiredCapabilities().FIREFOX
 caps["marionette"] = True
 
 options = Options()
-# options.headless = True
+options.headless = True
 browser = webdriver.Firefox(options=options, executable_path=r'bin/geckodriver')
 browser.install_addon(f'{current_dir}/bin/tampermonkey-4.17.6161.xpi', temporary=True)
 wait = WebDriverWait(browser, 20)
