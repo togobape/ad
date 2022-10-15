@@ -46,7 +46,7 @@ caps = DesiredCapabilities().FIREFOX
 caps["marionette"] = True
 print("Scrolling fix set")
 options = Options()
-print("Option loaded 
+print("Option loaded")
 options.headless = True
 browser = webdriver.Firefox(options=options, executable_path=r'bin/geckodriver')
 print("Browser Loaded")
